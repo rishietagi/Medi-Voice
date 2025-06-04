@@ -14,7 +14,7 @@ check_env(env, warn=True)
 model = DDPG("MlpPolicy", env, verbose=1)
 
 # Train the model
-model.learn(total_timesteps=10000)
+model.learn(total_timesteps=50000)
 
 # Save model
 model.save("ddpg_hr_model")

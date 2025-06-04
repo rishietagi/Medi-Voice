@@ -2,6 +2,7 @@ import pandas as pd
 from stable_baselines3 import DDPG
 from hr_sim_env import hr_sim_env
 import matplotlib.pyplot as plt
+import numpy as np
 
 env = hr_sim_env("speech_features_with_hr.csv")
 
@@ -36,3 +37,22 @@ plt.title("True vs Predicted Heart Rate")
 plt.xlabel("Step")
 plt.ylabel("Heart Rate (bpm)")
 plt.show()
+
+
+
+
+from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+
+
+true_hr = results_df['true_hr'].values
+predicted_hr = results_df['predicted_hr'].values
+
+mae = mean_absolute_error(true_hr, predicted_hr)
+mse = mean_squared_error(true_hr, predicted_hr)
+rmse = np.sqrt(mse)
+r2 = r2_score(true_hr, predicted_hr)
+
+print(f"MAE: {mae:.2f}")
+print(f"MSE: {mse:.2f}")
+print(f"RMSE: {rmse:.2f}")
+print(f"R^2 Score: {r2:.2f}")
