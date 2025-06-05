@@ -12,6 +12,8 @@ class hr_sim_env(gym.Env):
         
         # Features exclude filename and simulated_hr
         feature_cols = [col for col in self.df.columns if col not in ['filename', 'simulated_hr']]
+        if 'gender' in self.df.columns:
+            self.df['gender'] = self.df['gender'].map({'male': 0, 'female': 1, 'unknown': -1})
         self.features = self.df[feature_cols].values.astype(np.float32)
         
         self.targets = self.df['simulated_hr'].values.astype(np.float32)
