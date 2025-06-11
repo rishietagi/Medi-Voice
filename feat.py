@@ -2,31 +2,25 @@ import os
 import librosa
 import numpy as np
 import pandas as pd
+import joblib
 from scipy.signal import find_peaks
+from feat_gender import extract_features_from_audio
+
+gender_model = joblib.load("gender_classifier.pkl")
+gender_scaler = joblib.load("gender_scaler.pkl")
 
 def predict_gender(filepath):
-    y, sr = librosa.load(filepath, sr=16000)
-    
-    pitches, magnitudes = librosa.piptrack(y=y, sr=sr)
-    pitch = pitches[magnitudes > np.median(magnitudes)]
-    pitch = pitch[pitch > 0]
+    try:
+        gender_features = extract_features_from_audio(filepath)  
 
-    if len(pitch) == 0:
+        features_scaled = gender_scaler.transform(gender_features)
+
+        gender = gender_model.predict(features_scaled)[0]
+
+        return gender
+    except Exception as e:
+        print(f"Error predicting gender for {filepath}: {e}")
         return "unknown"
-    
-    pitch_mean = np.mean(pitch)
-    pitch_min = np.min(pitch)
-    pitch_max = np.max(pitch)
-    pitch_depth = pitch_max - pitch_min
-
-    energy = np.sum(librosa.feature.rms(y=y))
-
-    if pitch_mean < 160 and pitch_depth < 40:
-        return 'male'
-    elif pitch_mean >= 160 and energy > 0.1:
-        return 'female'
-    else:
-        return 'female' if pitch_mean >= 150 else 'male'
 
 def extract_features_for_file(filepath):
     y, sr = librosa.load(filepath, sr=16000)

@@ -19,7 +19,6 @@ st.write("Upload an audio sample to get heart rate estimate.")
 uploaded_file = st.file_uploader("Upload Audio", type=["wav", "mp3", "flac"])
 
 if uploaded_file is not None:
-    # Extract original extension
     ext = uploaded_file.name.split('.')[-1].lower()
     temp_path = f"temp_audio.{ext}"
     with open(temp_path, "wb") as f:
@@ -37,11 +36,10 @@ if uploaded_file is not None:
         input_feats = (input_feats - mean) / (std + 1e-8)
 
         if input_feats.shape[1] == 19:
-            input_feats = np.hstack([input_feats, np.array([[0.0]])])  # Add dummy HR
+            input_feats = np.hstack([input_feats, np.array([[0.0]])])  
 
         pred_action, _ = model.predict(input_feats, deterministic=True)
 
-        # Scale action to HR range (50 to 160 BPM)
         pred_hr = 0.5 * (pred_action[0] + 1) * (160 - 50) + 50
         pred_hr = round(float(pred_hr), 2)
 
