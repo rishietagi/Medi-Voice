@@ -29,18 +29,21 @@ if uploaded_file is not None:
 
     gender = features_df["gender"].values[0]
     st.markdown(f"**Detected Gender:** `{gender.capitalize()}`")
+    age = features_df["age"].values[0]
+    st.markdown(f"**Detected Age Group:** `{age.capitalize()}`")
 
-    if st.button("Detect Heart Rate"):
-        input_feats = features_df.drop(columns=["filename", "gender"]).values.astype(np.float32)
+if st.button("Detect Heart Rate"):
+    input_feats = features_df.drop(columns=["filename", "gender", "age"]).values.astype(np.float32)
 
-        input_feats = (input_feats - mean) / (std + 1e-8)
+    input_feats = (input_feats - mean) / (std + 1e-8)
 
-        if input_feats.shape[1] == 29:
-            input_feats = np.hstack([input_feats, np.array([[0.0]])])  
+    if input_feats.shape[1] == 29:
+        input_feats = np.hstack([input_feats, np.array([[0.0]])]) 
 
-        pred_action, _ = model.predict(input_feats, deterministic=True)
+    pred_action, _ = model.predict(input_feats, deterministic=True)
 
-        pred_hr = 0.5 * (pred_action[0] + 1) * (160 - 50) + 50
-        pred_hr = round(float(pred_hr), 2)
+    pred_hr = 0.5 * (pred_action[0] + 1) * (160 - 50) + 50
+    pred_hr = round(float(pred_hr), 2)
 
-        st.success(f"Predicted Heart Rate: **{pred_hr} BPM**")
+    st.success(f"Predicted Heart Rate: **{pred_hr} BPM**")
+

@@ -5,9 +5,22 @@ import pandas as pd
 import joblib
 from scipy.signal import find_peaks
 from feat_gender import extract_features_from_audio
+from feat_age import extract_age_features
 
 gender_model = joblib.load("gender_classifier.pkl")
 gender_scaler = joblib.load("gender_scaler.pkl")
+age_model = joblib.load("age_classifier.pkl")
+
+def predict_age(filepath):
+    try:
+        age_features = extract_age_features(filepath)
+
+        age = age_model.predict(age_features)[0]
+
+        return age
+    except Exception as e:
+        print(f"Error predicting age for {filepath}: {e}")
+        return "unknown"
 
 def predict_gender(filepath):
     try:
@@ -49,6 +62,8 @@ def extract_features_for_file(filepath):
     speaking_rate = len(peaks) / duration if duration > 0 else 0
 
     gender = predict_gender(filepath)
+    age = predict_age(filepath)
+
 
     mfcc_dict = {f"mfcc_{i+1}": mfcc_mean[i] for i in range(len(mfcc_mean))}
     mel_dict = {f"mel_{i+1}": mel_mean[i] for i in range(len(mel_mean))}
@@ -62,6 +77,7 @@ def extract_features_for_file(filepath):
         "energy": energy,
         "speaking_rate": speaking_rate,
         "gender": gender,
+        "age": age,
         **mfcc_dict,
         **mel_dict
     }
