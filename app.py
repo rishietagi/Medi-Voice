@@ -33,17 +33,25 @@ if uploaded_file is not None:
     st.markdown(f"**Detected Age Group:** `{age.capitalize()}`")
 
 if st.button("Detect Heart Rate"):
+
+    age_val = features_df["age"].values[0]
+    age_categories = ['young', 'mature', 'old']
+    age_encoded = np.array([[1.0 if age_val == age_cat else 0.0 for age_cat in age_categories]], dtype=np.float32)
+
     input_feats = features_df.drop(columns=["filename", "gender", "age"]).values.astype(np.float32)
 
     input_feats = (input_feats - mean) / (std + 1e-8)
 
-    if input_feats.shape[1] == 29:
-        input_feats = np.hstack([input_feats, np.array([[0.0]])]) 
+    full_input = np.hstack([input_feats, age_encoded])
 
-    pred_action, _ = model.predict(input_feats, deterministic=True)
+    # if input_feats.shape[1] == 30:
+    #     input_feats = np.hstack([input_feats, np.array([[0.0]])]) 
 
-    pred_hr = 0.5 * (pred_action[0] + 1) * (160 - 50) + 50
-    pred_hr = round(float(pred_hr), 2)
-
-    st.success(f"Predicted Heart Rate: **{pred_hr} BPM**")
+    if full_input.shape[1] != 32:
+        st.error(f"Input feature shape mismatch: got {full_input.shape[1]}, expected 32.")
+    else:
+        pred_action, _ = model.predict(full_input, deterministic=True)
+        pred_hr = 0.5 * (pred_action[0] + 1) * (160 - 50) + 50
+        pred_hr = round(float(pred_hr), 2)
+        st.success(f"Predicted Heart Rate: **{pred_hr} BPM**")
 
