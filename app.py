@@ -35,7 +35,7 @@ if uploaded_file is not None:
 
         input_feats = (input_feats - mean) / (std + 1e-8)
 
-        if input_feats.shape[1] == 19:
+        if input_feats.shape[1] == 29:
             input_feats = np.hstack([input_feats, np.array([[0.0]])])  
 
         pred_action, _ = model.predict(input_feats, deterministic=True)
