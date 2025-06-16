@@ -23,4 +23,4 @@ print("Accuracy:", accuracy_score(y_test, y_pred))
 print(classification_report(y_test, y_pred))
 
 joblib.dump(clf, "age_classifier.pkl")
-print("✅ Model saved as 'age_classifier.pkl'")
+print(" Model '")

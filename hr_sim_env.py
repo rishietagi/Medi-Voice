@@ -10,23 +10,18 @@ class hr_sim_env(gym.Env):
         self.df = pd.read_csv(csv_path)
         self.current_idx = 0
 
-        # Map gender to numeric
         if 'gender' in self.df.columns:
             self.df['gender'] = self.df['gender'].map({'male': 0, 'female': 1, 'unknown': -1})
 
-        # One-hot encode age
         if 'age' in self.df.columns:
             age_dummies = pd.get_dummies(self.df['age'], prefix='age')
             self.df = pd.concat([self.df.drop('age', axis=1), age_dummies], axis=1)
 
-        # Exclude target and filename from features
         feature_cols = [col for col in self.df.columns if col not in ['filename', 'simulated_hr']]
-        self.features_raw = self.df[feature_cols]  # save for reference
+        self.features_raw = self.df[feature_cols]  
 
-        # Identify columns to normalize (skip categorical: gender and age dummies)
         numeric_cols = [col for col in feature_cols if col not in ['gender'] and not col.startswith('age_')]
         
-        # Normalize only numeric columns
         self.mean = self.features_raw[numeric_cols].mean()
         self.std = self.features_raw[numeric_cols].std() + 1e-8
         self.features_raw[numeric_cols] = (self.features_raw[numeric_cols] - self.mean) / self.std
@@ -34,7 +29,6 @@ class hr_sim_env(gym.Env):
         self.features = self.features_raw.values.astype(np.float32)
         self.targets = self.df['simulated_hr'].values.astype(np.float32)
 
-        # Define observation and action space
         self.observation_space = spaces.Box(
             low=-10.0,
             high=10.0,
@@ -52,10 +46,9 @@ class hr_sim_env(gym.Env):
         obs = self._get_obs()
         info = {}
 
-        # Ensure shape and dtype match observation space
         obs = np.array(obs, dtype=np.float32).reshape(self.observation_space.shape)
         return obs, info
-
+ 
     def step(self, action):
         terminated = False
         truncated = False
