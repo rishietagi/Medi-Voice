@@ -8,7 +8,6 @@ import os
 from stable_baselines3 import DDPG
 from feat import extract_features_for_file
 
-# Load trained model and normalization stats
 model = DDPG.load("ddpg_hr_model")
 norm_stats = joblib.load("normalization_stats.pkl")
 mean = norm_stats["mean"]

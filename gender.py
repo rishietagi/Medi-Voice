@@ -5,16 +5,13 @@ import numpy as np
 import joblib
 import os
 
-# Load speaker recognition model from your local folder
 verification = SpeakerRecognition.from_hparams(
     source="spkrec-ecapa-voxceleb",
     savedir="pretrained_models/spkrec-ecapa-voxceleb",
 )
 
-# Path to your trained gender classifier
 GENDER_CLASSIFIER_PATH = "gender_classifier.joblib"
 
-# Load gender classifier if exists, else None
 if os.path.exists(GENDER_CLASSIFIER_PATH):
     gender_clf = joblib.load(GENDER_CLASSIFIER_PATH)
 else:
